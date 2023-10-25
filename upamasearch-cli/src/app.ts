@@ -1,10 +1,11 @@
 import { Command } from 'commander'
 import { Client } from '@elastic/elasticsearch'
 import figlet from 'figlet'
+import fs from 'fs'
 
 const client = new Client({ node: 'http://localhost:9200' })
 
-console.log(figlet.textSync('Upama Search CLI', { horizontalLayout: 'full' }))
+console.log(figlet.textSync('Upama Search CLI'))
 
 const program = new Command()
 program
@@ -70,7 +71,8 @@ async function searchPoet(name: string, client: Client) {
       },
     },
   })
-  console.log(results.hits.hits)
+  fs.writeFileSync('output.json', JSON.stringify(results.hits.hits, null,4))
+  //console.log(results.hits.hits)
 }
 
 async function searchTitle(title: string, client: Client) {
@@ -79,25 +81,27 @@ async function searchTitle(title: string, client: Client) {
     body: {
       query: {
         match: {
-          Title: title,
+          "Poem Title": title,
         },
       },
     },
   })
-  console.log(results.hits.hits)
+  fs.writeFileSync('output.json', JSON.stringify(results.hits.hits, null,4))
+  //console.log(results.hits.hits)
 }
 async function searchPoem(poem: string, client: Client) {
   const results = await client.search({
     index: 'upamasearch',
     body: {
       query: {
-        match: {
+        match_phrase: {
           'Poem Excerpt': poem,
-        },
-      },
-    },
+        }
+      }
+    }
   })
-  console.log(results.hits.hits)
+  fs.writeFileSync('output.json', JSON.stringify(results.hits.hits, null,4))
+  //console.log(results.hits.hits)
 }
 async function getMetaphors(source: string, client: Client) {
   const results = await client.search({
@@ -110,5 +114,6 @@ async function getMetaphors(source: string, client: Client) {
       },
     },
   })
-  console.log(results.hits.hits)
+  fs.writeFileSync('output.json', JSON.stringify(results.hits.hits, null,4))
+  //console.log(results.hits.hits)
 }
